@@ -6,7 +6,7 @@ Unity version 2017.2.0f3
 Scriptiong Runtime Version: .NET 4.6
 
 1. Generating Content
-- [ ] 01. Cellular Automata
+- [x] 01. Cellular Automata
 - [ ] 02. Marching Squares
 - [ ] 03. Creating Meshes
 
