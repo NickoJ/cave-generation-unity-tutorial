@@ -8,7 +8,7 @@ Scriptiong Runtime Version: .NET 4.6
 1. Generating Content
 - [x] 01. Cellular Automata
 - [x] 02. Marching Squares
-- [ ] 03. Creating Meshes
+- [x] 03. Creating Meshes
 
 2. Walls and Rooms
 - [ ] 01. 3D Walls
