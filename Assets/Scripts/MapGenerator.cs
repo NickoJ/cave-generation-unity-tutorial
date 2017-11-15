@@ -10,6 +10,7 @@ public class MapGenerator : MonoBehaviour
 	public int width = 60;
 	public int height = 80;
 	public int smoothTimes = 5;
+	public int borderSize = 5;
 
 	public string seed = string.Empty;
 	public bool useRandomSeed;
@@ -32,7 +33,23 @@ public class MapGenerator : MonoBehaviour
 		FillMap();
 
 		for (int i = 0; i < smoothTimes; ++i) SmoothMap();
-		
+
+		int[,] borderedMap = new int [width + borderSize * 2, height + borderSize * 2];
+		for (int x = 0; x < borderedMap.GetLength(0); x++)
+		{
+			for (int y = 0; y < borderedMap.GetLength(1); y++)
+			{
+				if (x >= borderSize && x < width + borderSize && y >= borderSize && y < height + borderSize) {
+					borderedMap[x, y] = map[x - borderSize, y - borderSize];
+				}
+				else
+				{
+					borderedMap[x, y] = 1;
+				}
+			}
+		}
+		map = borderedMap;
+
 		MeshGenerator gen = GetComponent<MeshGenerator>();
 		gen.GenerateMesh(map, 1);
 	}
@@ -81,21 +98,6 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 		return count;
-	}
-
-	private void OnDrawGizmos()
-	{
-		// if (map == null) return;
-
-		// for (int x = 0; x < width; ++x)
-		// {
-		// 	for (int y = 0; y < height; ++y)
-		// 	{
-		// 		Gizmos.color = (map[x,y] == 1) ? Color.red : Color.clear;
-		// 		var pos = new Vector3(-width/2 + x + 0.5f, 0, -height/2 + y + 0.5f);
-		// 		Gizmos.DrawCube(pos, Vector3.one);
-		// 	}
-		// }
 	}
 
 }

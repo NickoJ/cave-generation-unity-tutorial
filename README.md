@@ -11,7 +11,7 @@ Scriptiong Runtime Version: .NET 4.6
 - [x] 03. Creating Meshes
 
 2. Walls and Rooms
-- [ ] 01. 3D Walls
+- [x] 01. 3D Walls
 - [ ] 02. Detecting Regions
 - [ ] 03. Connecting Rooms
 
