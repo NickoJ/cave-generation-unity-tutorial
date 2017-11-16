@@ -13,7 +13,7 @@ Scriptiong Runtime Version: .NET 4.6
 2. Walls and Rooms
 - [x] 01. 3D Walls
 - [x] 02. Detecting Regions
-- [ ] 03. Connecting Rooms
+- [x] 03. Connecting Rooms
 
 3. Polish and Passageways
 - [ ] 01. Ensuring Connectivity

@@ -142,11 +142,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f42e452b77bf2594ea0cab587cea8886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapFillPercent: 45
+  mapFillPercent: 51
   width: 70
   height: 40
   smoothTimes: 5
-  borderSize: 5
+  borderSize: 1
+  wallThresholdShize: 50
+  roomThresholdSize: 50
   seed: 
   useRandomSeed: 1
 --- !u!4 &1649706999
