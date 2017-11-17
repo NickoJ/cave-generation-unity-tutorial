@@ -81,12 +81,33 @@ public class MapGenerator : MonoBehaviour
 			{
 				availableRooms.Add(new Room(roomRegion, map));
 			}
-		}		
+		}
+		availableRooms.Sort();
+		availableRooms[0].isMainRoom = true;
+		availableRooms[0].isAccessibleFromMainRoom = true;
+
 		ConnectClosestRooms(availableRooms);
 	}
 
-	private void ConnectClosestRooms(List<Room> allRooms)
+	private void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false)
 	{
+
+		var roomListA = new List<Room>();
+		var roomListB = new List<Room>();
+
+		if (forceAccessibilityFromMainRoom)
+		{
+			foreach(var room in allRooms)
+			{
+				if (room.isAccessibleFromMainRoom) roomListB.Add(room);
+				else roomListA.Add(room);
+			}
+		}
+		else
+		{
+			roomListA = allRooms;
+			roomListB = allRooms;
+		}
 
 		int bestDistance = 0;
 		var bestTileA = new Coord();
@@ -95,17 +116,16 @@ public class MapGenerator : MonoBehaviour
 		var bestRoomB = new Room();
 		bool possibleConnectionFound = false;
 
-		foreach(var roomA in allRooms)
-		{
-			possibleConnectionFound = false;
-			foreach(var roomB in allRooms)
+		foreach(var roomA in roomListA)
+		{ 
+			if (!forceAccessibilityFromMainRoom) 
 			{
-				if (roomA == roomB) continue;
-				if (roomA.IsConected(roomB)) 
-				{
-					possibleConnectionFound = false;
-					break;
-				}
+				possibleConnectionFound = false;
+				if (roomA.connectedRooms.Count > 0) continue;
+			}
+			foreach(var roomB in roomListB)
+			{
+				if (roomA == roomB || roomA.IsConected(roomB)) continue;
 
 				for (int tileIndexA = 0; tileIndexA < roomA.edgeTiles.Count; tileIndexA++)
 				{
@@ -127,9 +147,18 @@ public class MapGenerator : MonoBehaviour
 					}	
 				}
 			}
+			if (possibleConnectionFound && !forceAccessibilityFromMainRoom) 
+				CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
 		}
 
-		if (possibleConnectionFound) CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
+		if (possibleConnectionFound && forceAccessibilityFromMainRoom) 
+		{
+			CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
+			ConnectClosestRooms(allRooms, true);
+		}
+
+		if (!forceAccessibilityFromMainRoom)
+			ConnectClosestRooms(allRooms, true);
 	}
 
 	private void CreatePassage(Room roomA, Room roomB, Coord tileA, Coord tileB)
@@ -252,13 +281,15 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
-	public class Room
+	public class Room : IComparable<Room>
 	{
 		
 		public List<Coord> tiles;
 		public List<Coord> edgeTiles;
 		public List<Room> connectedRooms;
 		public int roomSize;
+		public bool isAccessibleFromMainRoom;
+		public bool isMainRoom;
 
 		public Room() {}
 
@@ -281,13 +312,28 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 
+		public void SetAccessibleFromMainRoom()
+		{
+			if (!isAccessibleFromMainRoom)
+			{
+				isAccessibleFromMainRoom = true;
+				foreach(var connectedRoom in connectedRooms)
+					connectedRoom.SetAccessibleFromMainRoom();
+			}
+		}
+
 		public static void ConnectRooms(Room roomA, Room roomB)
 		{
+			if (roomA.isAccessibleFromMainRoom) roomB.SetAccessibleFromMainRoom();
+			else if (roomB.isAccessibleFromMainRoom) roomA.SetAccessibleFromMainRoom();
+
 			roomA.connectedRooms.Add(roomB);
 			roomB.connectedRooms.Add(roomA);
 		}
 
-		public bool IsConected(Room other) => connectedRooms.Contains(other);
+        public bool IsConected(Room other) => connectedRooms.Contains(other);
+
+        public int CompareTo(Room other) => other.roomSize.CompareTo(roomSize);
 
 	}
 

@@ -16,7 +16,7 @@ Scriptiong Runtime Version: .NET 4.6
 - [x] 03. Connecting Rooms
 
 3. Polish and Passageways
-- [ ] 01. Ensuring Connectivity
+- [x] 01. Ensuring Connectivity
 - [ ] 02. Passageways
 - [ ] 03. Collisions & Textures
 
