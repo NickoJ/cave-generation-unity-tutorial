@@ -77,38 +77,38 @@ public class MeshGenerator : MonoBehaviour
 
 	private void TriangulateSquares(Square square)
 	{
-		switch(square.configuration)
-		{
-			case 0: break;
-			// 1 points
-			case 1: MeshFromPoints(square.midLeft, square.midBottom, square.bottomLeft); break;
-			case 2: MeshFromPoints(square.bottomRight, square.midBottom, square.midRight); break;
-			case 4: MeshFromPoints(square.topRight, square.midRight, square.midTop); break;
-			case 8: MeshFromPoints(square.topLeft, square.midTop, square.midLeft); break;
+        switch (square.configuration) {
+        case 0: break;
 
-			// 2 points
-			case 3: MeshFromPoints(square.midRight, square.bottomRight, square.bottomLeft, square.midLeft); break;
-			case 6: MeshFromPoints(square.midTop, square.topRight, square.bottomRight, square.midBottom); break;
-			case 9: MeshFromPoints(square.topLeft, square.midTop, square.midBottom, square.bottomLeft); break;
-			case 12: MeshFromPoints(square.topLeft, square.topRight, square.midRight, square.midLeft); break;
-			case 5: MeshFromPoints(square.midTop, square.topRight, square.midRight, square.midBottom, square.bottomLeft, square.midLeft); break;
-			case 10: MeshFromPoints(square.topLeft, square.midTop, square.midRight, square.bottomRight, square.midBottom, square.midLeft); break;
+        // 1 points:
+        case 1: MeshFromPoints(square.midLeft, square.midBottom, square.bottomLeft); break;
+        case 2: MeshFromPoints(square.bottomRight, square.midBottom, square.midRight); break;
+        case 4: MeshFromPoints(square.topRight, square.midRight, square.midTop); break;
+        case 8: MeshFromPoints(square.topLeft, square.midTop, square.midLeft); break;
 
-			// 3 points
-			case 7: MeshFromPoints(square.midTop, square.topRight, square.bottomRight, square.bottomLeft, square.midLeft); break;
-			case 11: MeshFromPoints(square.topLeft, square.midTop, square.midRight, square.bottomRight, square.bottomLeft); break;
-			case 13: MeshFromPoints(square.topLeft, square.topRight, square.midRight, square.midBottom, square.bottomLeft); break;
-			case 14: MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.midBottom, square.midLeft); break;
+        // 2 points:
+        case 3: MeshFromPoints(square.midRight, square.bottomRight, square.bottomLeft, square.midLeft); break;
+        case 6: MeshFromPoints(square.midTop, square.topRight, square.bottomRight, square.midBottom); break;
+        case 9: MeshFromPoints(square.topLeft, square.midTop, square.midBottom, square.bottomLeft); break;
+        case 12: MeshFromPoints(square.topLeft, square.topRight, square.midRight, square.midLeft); break;
+        case 5: MeshFromPoints(square.midTop, square.topRight, square.midRight, square.midBottom, square.bottomLeft, square.midLeft); break;
+        case 10: MeshFromPoints(square.topLeft, square.midTop, square.midRight, square.bottomRight, square.midBottom, square.midLeft); break;
 
-			// 4 points
-			case 15:
-			 	MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.bottomLeft); 
-				checkedVertices.Add(square.topLeft.vertexIndex);
-				checkedVertices.Add(square.topRight.vertexIndex);
-				checkedVertices.Add(square.bottomRight.vertexIndex);
-				checkedVertices.Add(square.bottomLeft.vertexIndex);
-				break;
-		}
+        // 3 point:
+        case 7: MeshFromPoints(square.midTop, square.topRight, square.bottomRight, square.bottomLeft, square.midLeft); break;
+        case 11: MeshFromPoints(square.topLeft, square.midTop, square.midRight, square.bottomRight, square.bottomLeft); break;
+        case 13: MeshFromPoints(square.topLeft, square.topRight, square.midRight, square.midBottom, square.bottomLeft); break;
+        case 14: MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.midBottom, square.midLeft); break;
+
+        // 4 point:
+        case 15:
+            MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.bottomLeft);
+            checkedVertices.Add(square.topLeft.vertexIndex);
+            checkedVertices.Add(square.topRight.vertexIndex);
+            checkedVertices.Add(square.bottomRight.vertexIndex);
+            checkedVertices.Add(square.bottomLeft.vertexIndex);
+            break;
+        }
 	}
 
 	private void MeshFromPoints(params Node[] points)
@@ -252,34 +252,33 @@ public class MeshGenerator : MonoBehaviour
 
 		public SquareGrid(int[,] map, float squareSize)
 		{
-			int ncX = map.GetLength(0);
-			int ncY = map.GetLength(1);
+            int nodeCountX = map.GetLength(0);
+            int nodeCountY = map.GetLength(1);
+            float mapWidth = nodeCountX * squareSize;
+            float mapHeight = nodeCountY * squareSize;
 
-			float mapWidth = ncX * squareSize;
-			float mapHeight = ncY * squareSize;
+            ControlNode[,] controlNodes = new ControlNode[nodeCountX, nodeCountY];
 
-			var controlNodes = new ControlNode[ncX, ncY];
+            for (int x = 0; x < nodeCountX; x++)
+            {
+                for (int y = 0; y < nodeCountY; y++)
+                {
+                    Vector3 pos = new Vector3(-mapWidth / 2 + x * squareSize + squareSize / 2, 0, -mapHeight / 2 + y * squareSize + squareSize / 2);
+                    controlNodes[x, y] = new ControlNode(pos, map[x, y] == 1, squareSize);
+                }
+            }
 
-			for (int x = 0; x < ncX; ++x)
-			{
-				for (int y = 0; y < ncY; ++y)
-				{
-					var pos = new Vector3(-mapWidth/2 + x * squareSize + squareSize / 2, 0, -mapHeight / 2 + y * squareSize + squareSize / 2);
-					controlNodes[x, y] = new ControlNode(pos, map[x,y] == 1, squareSize);
-				}
-			}
+            squares = new Square[nodeCountX - 1, nodeCountY - 1];
+            for (int x = 0; x < nodeCountX - 1; x++)
+            {
+                for (int y = 0; y < nodeCountY - 1; y++)
+                {
+                    squares[x, y] = new Square(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
+                }
+            }
+        }
 
-			squares = new Square[ncX - 1, ncY - 1];
-			for (int x = 0; x < ncX - 1; ++x)
-			{
-				for (int y = 0; y < ncY - 1; ++y)
-				{
-					squares[x,y] = new Square(controlNodes[x,y+1], controlNodes[x+1,y+1], controlNodes[x+1,y], controlNodes[x,y]);
-				}
-			}
-		}
-
-	}
+    }
 
 	public class Square
 	{
@@ -296,7 +295,8 @@ public class MeshGenerator : MonoBehaviour
 
 		public int configuration;
 
-		public Square(ControlNode topLeft, ControlNode topRight, ControlNode bottomRight, ControlNode bottomLeft)
+		public Square(ControlNode topLeft, ControlNode topRight, 
+            ControlNode bottomRight, ControlNode bottomLeft)
 		{
 			this.topLeft = topLeft;
 			this.topRight = topRight;
@@ -308,10 +308,10 @@ public class MeshGenerator : MonoBehaviour
 			midBottom = bottomLeft.right;
 			midLeft = bottomLeft.above;
 
-			if (topLeft.active) configuration = configuration + 8;
-			if (topRight.active) configuration = configuration + 4;
-			if (bottomRight.active) configuration = configuration + 2;
-			if (bottomLeft.active) configuration = configuration + 1;
+			if (topLeft.active) configuration += 8;
+			if (topRight.active) configuration += 4;
+			if (bottomRight.active) configuration += 2;
+			if (bottomLeft.active) configuration += 1;
 		}
 
 	}
