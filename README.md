@@ -18,5 +18,3 @@ Scriptiong Runtime Version: .NET 4.6
 3. Polish and Passageways
 - [x] 01. Ensuring Connectivity
 - [x] 02. Passageways
-- [ ] 03. Collisions & Textures
-
